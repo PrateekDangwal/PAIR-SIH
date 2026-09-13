@@ -1,62 +1,7 @@
 'use client';
-
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Activity, CheckCircle2, Clock3, FileText, ShieldCheck } from 'lucide-react';
-import { apiFetch } from '@/lib/api';
-
-type Event = { id: number; project_id: number | null; action: string; actor: string; details: string | null; created_at: string };
-
-function iconFor(action: string) {
-  if (action.includes('compliance')) return ShieldCheck;
-  if (action.includes('document')) return FileText;
-  if (action.includes('project')) return CheckCircle2;
-  return Activity;
-}
-
-export default function ActivityPage() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    apiFetch<Event[]>('/api/v1/audit/events?limit=100')
-      .then(setEvents)
-      .finally(() => setLoading(false));
-  }, []);
-
-  return (
-    <motion.div className="min-h-full p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <p className="text-sm text-purple-400 mb-2">Traceability</p>
-          <h1 className="text-3xl font-bold">Activity</h1>
-          <p className="text-gray-500 mt-2">An audit-friendly timeline of project and compliance actions.</p>
-        </div>
-
-        {loading ? <p className="text-gray-500">Loading activity…</p> : events.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 p-12 text-center text-gray-500">No activity yet. Actions will appear here as you work.</div>
-        ) : (
-          <div className="space-y-3">
-            {events.map((event) => {
-              const Icon = iconFor(event.action);
-              return (
-                <div key={event.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 flex gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center shrink-0"><Icon size={18} className="text-purple-400" /></div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold text-white">{event.action.replace(/_/g, ' ')}</p>
-                      <span className="text-xs rounded-full border border-white/10 px-2 py-1 text-gray-500">{event.actor}</span>
-                    </div>
-                    {event.details && <p className="text-sm text-gray-400 mt-2 break-words">{event.details}</p>}
-                    <p className="text-xs text-gray-600 mt-2 flex items-center gap-1"><Clock3 size={12} />{new Date(event.created_at).toLocaleString()}</p>
-                  </div>
-                  {event.project_id && <span className="text-xs text-gray-600">Project #{event.project_id}</span>}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
-}
+import {useEffect,useState} from 'react';
+import {Activity,CheckCircle2,Clock3,FileText,RefreshCw,ShieldCheck} from 'lucide-react';
+import {apiFetch} from '@/lib/api';
+import {IndustrialPanel,TechnicalLabel} from '@/components/ui/industrial';
+type Event={id:number;project_id:number|null;action:string;actor:string;details:any;created_at:string};
+export default function ActivityPage(){const [events,setEvents]=useState<Event[]>([]);const [loading,setLoading]=useState(true);const [error,setError]=useState('');async function load(){setLoading(true);try{setEvents(await apiFetch<Event[]>('/api/v1/audit/events?limit=100'))}catch(e){setError(e instanceof Error?e.message:'Unable to load audit trail.')}finally{setLoading(false)}}useEffect(()=>{load()},[]);function icon(a:string){if(a.includes('compliance')||a.includes('recommendation'))return ShieldCheck;if(a.includes('document'))return FileText;if(a.includes('project'))return CheckCircle2;return Activity}return <div className="mx-auto max-w-[1200px] px-4 py-7 md:px-7"><div className="flex items-end justify-between"><div><TechnicalLabel>TRACEABILITY / AUDIT</TechnicalLabel><h1 className="mt-2 text-4xl font-extrabold tracking-[-.04em]">Risk & Audit</h1><p className="mt-2 text-sm text-slate">Operational events recorded by the PAIR backend.</p></div><button onClick={load} className="industrial-button rounded-xl bg-chassis p-3" aria-label="Refresh"><RefreshCw size={17}/></button></div>{error&&<p className="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</p>}{loading?<div className="py-20 text-center text-sm text-slate">Loading audit events…</div>:events.length===0?<IndustrialPanel className="mt-8 p-14 text-center text-sm text-slate">No events recorded yet.</IndustrialPanel>:<div className="relative mt-8 space-y-4">{events.map(e=>{const Icon=icon(e.action);return <IndustrialPanel key={e.id} className="p-5"><div className="flex gap-4"><div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-chassis shadow-recessed"><Icon size={18} className="text-accent"/></div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-3"><h2 className="text-sm font-extrabold capitalize">{e.action.replace(/_/g,' ')}</h2><span className="rounded-md bg-[#d1d9e6] px-2 py-1 technical text-[8px] text-slate">{e.actor}</span>{e.project_id&&<span className="technical text-[8px] text-slate">PROJECT #{e.project_id}</span>}</div>{e.details&&<p className="mt-3 break-words text-xs leading-5 text-slate">{typeof e.details==='string'?e.details:JSON.stringify(e.details)}</p>}<p className="mt-3 flex items-center gap-1 font-mono text-[9px] text-slate"><Clock3 size={11}/>{new Date(e.created_at).toLocaleString()}</p></div></div></IndustrialPanel>})}</div>}</div>}

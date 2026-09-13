@@ -1,44 +1,8 @@
 'use client';
-
-import { useEffect, useState } from 'react';
-
-export function BackgroundVideo() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const handleChange = () => {
-      setPrefersReducedMotion(mediaQuery.matches);
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
-  if (prefersReducedMotion) {
-    return (
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-900/40 to-black/80" />
-    );
-  }
-
-  return (
-    <>
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover"
-        poster="/images/pair-fallback.jpg"
-      >
-        <source src="/videos/pair-background.mp4" type="video/mp4" />
-      </video>
-
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/80" />
-
-      <div className="absolute inset-0 bg-gradient-radial from-purple-900/20 via-transparent to-black opacity-70" />
-    </>
-  );
+import { useEffect,useState } from 'react';
+export function BackgroundVideo(){
+ const [reduce,setReduce]=useState(false);
+ useEffect(()=>{const m=window.matchMedia('(prefers-reduced-motion: reduce)');const fn=()=>setReduce(m.matches);fn();m.addEventListener('change',fn);return()=>m.removeEventListener('change',fn)},[]);
+ if(reduce) return <div className="absolute inset-0 bg-[#2d3436]"/>;
+ return <><video autoPlay muted loop playsInline poster="/images/pair-fallback.jpg" className="absolute inset-0 h-full w-full object-cover opacity-45"><source src="/videos/pair-background.mp4" type="video/mp4"/></video><div className="absolute inset-0 bg-gradient-to-b from-[#2d3436]/80 via-[#2d3436]/70 to-[#2d3436]"/></>;
 }

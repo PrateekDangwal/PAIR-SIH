@@ -1,153 +1,22 @@
 'use client';
-
-import { useEffect, useState } from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import {
-  ArrowUpRight, CheckCircle2, FileSearch, FolderOpen, AlertTriangle,
-  MessageSquare, ShieldCheck, Activity, Plus
-} from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
-import { apiFetch } from '@/lib/api';
+import {motion} from 'framer-motion';
+import {Activity,ArrowRight,ClipboardCheck,FileCheck2,FolderOpen,Plus,ShieldAlert} from 'lucide-react';
+import {apiFetch} from '@/lib/api';
+import {useAuth} from '@/hooks/use-auth';
+import {IndustrialPanel,StatusLED,TechnicalLabel} from '@/components/ui/industrial';
+import {Project,Summary} from '@/lib/types';
 
-type Project = { id: number; name: string; description: string | null; gem_tender_id: string | null; status: string };
-type Summary = {
-  total_requirements: number; evaluated_requirements: number; compliant: number;
-  non_compliant: number; partial: number; needs_review: number; insufficient_data: number;
-  compliance_score: number; risk_level: 'low' | 'medium' | 'high';
-};
-
-export default function DashboardPage() {
-  const { user } = useAuth();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [summaries, setSummaries] = useState<Record<number, Summary>>({});
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await apiFetch<{ projects: Project[] }>('/api/v1/projects');
-        setProjects(data.projects);
-        const pairs = await Promise.all(data.projects.slice(0, 8).map(async (p) => {
-          try { return [p.id, await apiFetch<Summary>(`/api/v1/compliance/projects/${p.id}/summary`)] as const; }
-          catch { return [p.id, null] as const; }
-        }));
-        setSummaries(Object.fromEntries(pairs.filter((x): x is [number, Summary] => x[1] !== null)));
-      } finally { setLoading(false); }
-    })();
-  }, []);
-
-  const all = Object.values(summaries);
-  const requirements = all.reduce((n, s) => n + s.total_requirements, 0);
-  const compliant = all.reduce((n, s) => n + s.compliant, 0);
-  const attention = all.reduce((n, s) => n + s.non_compliant + s.needs_review + s.insufficient_data, 0);
-  const highRisk = all.filter((s) => s.risk_level === 'high').length;
-
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-
-  return (
-    <motion.div className="min-h-full p-4 md:p-6 lg:p-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="mx-auto max-w-[1400px] space-y-7">
-        <section className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="pair-kicker mb-3">GeM procurement intelligence</p>
-            <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.03em]">{greeting}, {user?.name || 'Procurement Officer'}</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
-              Review tender requirements, bidder evidence, compliance and risk from one evidence-first workspace.
-            </p>
-          </div>
-          <Link href="/app/projects" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black hover:bg-gray-200">
-            <Plus size={16} /> New bid review
-          </Link>
-        </section>
-
-        <section className="grid grid-cols-2 lg:grid-cols-4 border border-white/[0.07] rounded-xl overflow-hidden bg-[#101012]">
-          {([
-            ['Active bid reviews', projects.length, FolderOpen],
-            ['Requirements', requirements, FileSearch],
-            ['Verified', compliant, CheckCircle2],
-            ['Attention', attention, AlertTriangle],
-          ] as const).map(([label, value, Icon], i) => {
-            const I = Icon;
-            return (
-              <div key={String(label)} className={`p-5 ${i < 3 ? 'border-r border-white/[0.07]' : ''} ${i >= 2 ? 'lg:border-t-0' : ''}`}>
-                <div className="flex items-center justify-between">
-                  <p className="text-[11px] uppercase tracking-[0.12em] text-gray-600">{String(label)}</p>
-                  <I size={15} className="text-gray-600" />
-                </div>
-                <p className="mt-3 text-2xl font-semibold">{loading ? '—' : value}</p>
-              </div>
-            );
-          })}
-        </section>
-
-        <section className="grid lg:grid-cols-[1.45fr_.75fr] gap-5">
-          <div className="rounded-xl border border-white/[0.07] bg-[#101012] overflow-hidden">
-            <div className="flex items-center justify-between border-b border-white/[0.07] px-5 py-4">
-              <div>
-                <p className="pair-kicker">Recent reviews</p>
-                <h2 className="mt-1 text-base font-medium">Bid compliance workspace</h2>
-              </div>
-              <Link href="/app/projects" className="text-xs text-gray-500 hover:text-white">View all <ArrowUpRight size={13} className="inline ml-1" /></Link>
-            </div>
-            {loading ? <div className="p-8 text-sm text-gray-600">Loading reviews…</div> :
-              projects.length === 0 ? (
-                <div className="p-10 text-center">
-                  <FolderOpen size={22} className="mx-auto text-gray-600" />
-                  <p className="mt-3 text-sm text-gray-400">No bid reviews yet.</p>
-                  <Link href="/app/projects" className="mt-4 inline-flex text-xs text-violet-300">Create your first review</Link>
-                </div>
-              ) : (
-                <div>
-                  {projects.slice(0, 6).map((p) => {
-                    const s = summaries[p.id];
-                    return (
-                      <Link href={`/app/projects/${p.id}`} key={p.id} className="pair-table-row flex items-center gap-4 px-5 py-4 hover:bg-white/[0.018]">
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-gray-200">{p.name}</p>
-                          <p className="mt-1 truncate text-[11px] text-gray-600">{p.gem_tender_id || p.description || 'GeM compliance review'}</p>
-                        </div>
-                        <div className="hidden sm:block text-right">
-                          <p className="text-xs text-gray-500">{s ? `${s.evaluated_requirements}/${s.total_requirements} evaluated` : 'Not analyzed'}</p>
-                        </div>
-                        <div className="w-20 text-right">
-                          <p className="text-sm font-semibold">{s ? `${s.compliance_score}%` : '—'}</p>
-                          <p className={`text-[10px] uppercase tracking-wider ${s?.risk_level === 'high' ? 'text-red-400' : s?.risk_level === 'medium' ? 'text-amber-300' : s ? 'text-emerald-400' : 'text-gray-600'}`}>{s?.risk_level || 'pending'}</p>
-                        </div>
-                        <ArrowUpRight size={15} className="text-gray-700" />
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-          </div>
-
-          <div className="rounded-xl border border-white/[0.07] bg-[#101012] p-5">
-            <p className="pair-kicker">Decision readiness</p>
-            <h2 className="mt-1 text-base font-medium">Evidence picture</h2>
-            <div className="mt-6 space-y-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-400/10"><ShieldCheck size={17} className="text-emerald-400" /></div>
-                <div><p className="text-sm">Verified requirements</p><p className="text-[11px] text-gray-600">{compliant} across loaded reviews</p></div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-300/10"><AlertTriangle size={17} className="text-amber-300" /></div>
-                <div><p className="text-sm">Needs attention</p><p className="text-[11px] text-gray-600">{attention} unresolved findings</p></div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-400/10"><Activity size={17} className="text-red-400" /></div>
-                <div><p className="text-sm">High-risk reviews</p><p className="text-[11px] text-gray-600">{highRisk} currently high risk</p></div>
-              </div>
-            </div>
-            <div className="mt-7 border-t border-white/[0.07] pt-5">
-              <Link href="/app/chat" className="flex items-center justify-between rounded-lg border border-white/[0.07] bg-white/[0.02] px-3.5 py-3 text-xs text-gray-400 hover:text-white hover:bg-white/[0.04]">
-                Ask PAIR about a tender <MessageSquare size={14} />
-              </Link>
-            </div>
-          </div>
-        </section>
-      </div>
-    </motion.div>
-  );
+export default function Dashboard(){
+ const {user}=useAuth();const [projects,setProjects]=useState<Project[]>([]);const [summaries,setSummaries]=useState<Record<number,Summary>>({});const [loading,setLoading]=useState(true);
+ useEffect(()=>{(async()=>{try{const d=await apiFetch<{projects:Project[]}>('/api/v1/projects');setProjects(d.projects);const pairs=await Promise.all(d.projects.slice(0,10).map(async p=>{try{return [p.id,await apiFetch<Summary>(`/api/v1/compliance/projects/${p.id}/summary`)] as const}catch{return [p.id,null] as const}}));setSummaries(Object.fromEntries(pairs.filter((x):x is [number,Summary]=>!!x[1])))}finally{setLoading(false)}})()},[]);
+ const totals=useMemo(()=>{const s=Object.values(summaries);return {req:s.reduce((a,x)=>a+x.total_requirements,0),ok:s.reduce((a,x)=>a+x.compliant,0),attention:s.reduce((a,x)=>a+x.non_compliant+x.needs_review+x.insufficient_data,0),high:s.filter(x=>x.risk_level==='high').length}},[summaries]);
+ const greeting=new Date().getHours()<12?'GOOD MORNING':new Date().getHours()<18?'GOOD AFTERNOON':'GOOD EVENING';
+ return <div className="mx-auto max-w-[1450px] px-4 py-6 md:px-7 md:py-8">
+  <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"><div><TechnicalLabel>CONTROL ROOM / OVERVIEW</TechnicalLabel><h1 className="mt-2 text-3xl font-extrabold tracking-[-.04em] md:text-4xl">{greeting}, {user?.name||'OFFICER'}.</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-slate">Your evidence-first procurement workspace. Monitor active reviews, unresolved findings and decision readiness.</p></div><Link href="/app/projects" className="industrial-button industrial-button-accent inline-flex w-fit items-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase"><Plus size={16}/> New bid review</Link></div>
+  <div className="mt-7 grid grid-cols-2 gap-4 xl:grid-cols-4">{[['ACTIVE REVIEWS',projects.length,FolderOpen],['REQUIREMENTS',totals.req,FileCheck2],['COMPLIANT',totals.ok,ClipboardCheck],['ATTENTION',totals.attention,ShieldAlert]].map(([l,v,I])=>{const Icon=I as any;return <IndustrialPanel key={l as string} className="p-5"><div className="flex items-center justify-between"><TechnicalLabel>{l as string}</TechnicalLabel><Icon size={17} className="text-slate"/></div><p className="mt-5 font-mono text-3xl font-bold text-ink">{loading?'—':v as any}</p><div className="mt-4 h-1.5 rounded-full bg-recessed shadow-recessed"><div className="h-full w-2/3 rounded-full bg-accent"/></div></IndustrialPanel>})}</div>
+  <div className="mt-6 grid gap-6 xl:grid-cols-[1.5fr_.7fr]"><IndustrialPanel className="overflow-hidden p-0"><div className="flex items-center justify-between border-b border-slate/15 px-5 py-4"><div><TechnicalLabel>RECENT WORKSPACES</TechnicalLabel><h2 className="mt-1 text-lg font-extrabold">Bid review queue</h2></div><Link href="/app/projects" className="text-xs font-bold text-accent">VIEW ALL <ArrowRight size={13} className="inline"/></Link></div>{loading?<div className="p-10 text-center text-sm text-slate">Loading workspaces…</div>:projects.length===0?<div className="p-12 text-center"><FolderOpen className="mx-auto text-slate" size={28}/><p className="mt-3 font-bold">No reviews yet.</p><p className="mt-1 text-xs text-slate">Create a workspace and upload a tender PDF.</p></div>:projects.slice(0,7).map(p=>{const s=summaries[p.id];return <Link href={`/app/projects/${p.id}`} key={p.id} className="grid gap-3 border-b border-slate/10 px-5 py-4 transition hover:bg-white/40 sm:grid-cols-[1fr_150px_100px_22px] sm:items-center"><div className="min-w-0"><p className="truncate text-sm font-extrabold">{p.name}</p><p className="mt-1 truncate text-[11px] text-slate">{p.gem_tender_id||p.description||'GeM bid review'}</p></div><div className="text-xs font-mono text-slate">{s?`${s.evaluated_requirements}/${s.total_requirements} EVALUATED`:'NOT ANALYZED'}</div><div><span className={`technical text-[9px] font-bold ${s?.risk_level==='high'?'text-red-600':s?.risk_level==='medium'?'text-amber-600':s?'text-emerald-700':'text-slate'}`}>{s?s.risk_level:'PENDING'}</span></div><ArrowRight size={15} className="text-slate"/></Link>})}</IndustrialPanel>
+  <div className="space-y-6"><IndustrialPanel className="p-6"><div className="flex items-center justify-between"><TechnicalLabel>DECISION READINESS</TechnicalLabel><StatusLED status="online"/></div><h2 className="mt-2 text-xl font-extrabold">Review posture</h2><div className="mt-7 space-y-4">{[['Evidence available',totals.ok,'emerald'],['Needs officer attention',totals.attention,'amber'],['High-risk workspaces',totals.high,'red']].map(([l,v,c])=><div key={l as string} className="industrial-recessed rounded-xl p-4"><div className="flex justify-between"><span className="text-xs font-bold text-slate">{l as string}</span><span className={`font-mono text-lg font-bold ${c==='red'?'text-red-600':c==='amber'?'text-amber-600':'text-emerald-700'}`}>{v as number}</span></div></div>)}</div></IndustrialPanel><Link href="/app/chat" className="industrial-panel block rounded-2xl p-6 transition hover:-translate-y-1"><div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-full bg-chassis shadow-floating"><Activity size={19} className="text-accent"/></div><div><TechnicalLabel>PAIR ASSISTANT</TechnicalLabel><p className="mt-1 text-sm font-extrabold">Ask about a tender or evidence.</p></div></div></Link></div></div>
+ </div>
 }

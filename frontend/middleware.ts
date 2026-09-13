@@ -1,18 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-
-  if (pathname.startsWith('/app')) {
-    const userCookie = request.cookies.get('pair_user');
-    if (!userCookie) {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
-  }
-
+export function middleware(request:NextRequest){
+  if(request.nextUrl.pathname.startsWith('/app') && !request.cookies.get('pair_user')) return NextResponse.redirect(new URL('/login',request.url));
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: ['/app/:path*'],
-};
+export const config={matcher:['/app/:path*']};
