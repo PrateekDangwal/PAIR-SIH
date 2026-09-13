@@ -57,7 +57,9 @@ export default function HowItWorksPage() {
                     {n} / STAGE
                   </p>
 
-                  <h2 className="mt-1 text-xl font-extrabold">{t}</h2>
+                  <h2 className="mt-1 text-xl font-extrabold">
+                    {t}
+                  </h2>
 
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-slate">
                     {d}
