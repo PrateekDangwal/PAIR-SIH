@@ -1,24 +1,73 @@
-export const metadata = {
-  title: 'How PAIR Works',
-  description: 'Understand PAIR orchestration process',
-};
+﻿import {
+  FileText,
+  ListChecks,
+  SearchCheck,
+  ShieldCheck,
+  AlertTriangle,
+  UserCheck,
+  type LucideIcon,
+} from "lucide-react";
+
+const steps: [string, string, string, LucideIcon][] = [
+  ["01", "Tender intake", "Upload the tender PDF and create a project workspace.", FileText],
+  ["02", "Requirement extraction", "PAIR extracts structured requirements with source context.", ListChecks],
+  ["03", "Bidder evidence", "Upload bidder material and extract factual evidence.", SearchCheck],
+  ["04", "Compliance analysis", "Evaluate each requirement against available evidence.", ShieldCheck],
+  ["05", "Risk review", "Surface non-compliance, unresolved evidence and mandatory findings.", AlertTriangle],
+  ["06", "Officer decision", "Use the recommendation as decision support—not as a substitute for the officer.", UserCheck],
+];
 
 export default function HowItWorksPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <h1 className="text-5xl font-bold text-white mb-12">How PAIR Works</h1>
-      <div className="grid md:grid-cols-2 gap-12">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-white">Understanding Goals</h2>
-          <p className="text-gray-400">
-            PAIR analyzes user goals and breaks them into actionable tasks.
-          </p>
-        </div>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-white">Planning Tasks</h2>
-          <p className="text-gray-400">
-            Tasks are organized with dependencies and assigned to appropriate models.
-          </p>
+    <div className="mx-auto max-w-6xl px-5 py-14 md:py-20">
+      <div className="max-w-3xl">
+        <p className="technical text-[10px] font-bold text-accent">
+          WORKFLOW / DETAILED
+        </p>
+
+        <h1 className="mt-3 text-5xl font-extrabold tracking-[-.05em] md:text-6xl">
+          How PAIR works
+        </h1>
+
+        <p className="mt-5 text-base leading-7 text-slate">
+          A transparent pipeline from source documents to an evidence-backed review surface.
+        </p>
+      </div>
+
+      <div className="relative mt-14">
+        <div className="absolute bottom-8 left-8 top-8 hidden w-1 rounded-full bg-recessed shadow-recessed md:block" />
+
+        <div className="space-y-5">
+          {steps.map(([n, t, d, Icon]) => (
+            <div
+              key={n}
+              className="industrial-panel relative rounded-2xl p-6 md:ml-16"
+            >
+              <div className="absolute -left-[4.2rem] top-5 hidden h-8 w-8 items-center justify-center rounded-full bg-[#2d3436] text-[9px] font-bold text-white shadow-floating md:flex">
+                {n}
+              </div>
+
+              <div className="flex gap-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-chassis shadow-floating">
+                  <Icon size={20} className="text-accent" />
+                </div>
+
+                <div>
+                  <p className="technical text-[9px] text-slate">
+                    {n} / STAGE
+                  </p>
+
+                  <h2 className="mt-1 text-xl font-extrabold">
+                    {t}
+                  </h2>
+
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-slate">
+                    {d}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

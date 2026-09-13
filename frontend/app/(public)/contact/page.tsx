@@ -1,19 +1,2 @@
 import { ContactForm } from '@/components/landing/contact-form';
-
-export const metadata = {
-  title: 'Contact PAIR',
-  description: 'Get in touch with the PAIR team',
-};
-
-export default function ContactPage() {
-  return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <h1 className="text-4xl font-bold text-white mb-4">Contact Us</h1>
-      <p className="text-gray-400 mb-12">
-        Have questions? We'd love to hear from you. Send us a message and we'll
-        respond as soon as possible.
-      </p>
-      <ContactForm />
-    </div>
-  );
-}
+export default function ContactPage(){return <div className="mx-auto max-w-6xl px-5 py-14 md:py-20"><div className="mb-10"><p className="technical text-[10px] font-bold text-accent">CONTACT / PAIR</p><h1 className="mt-3 text-5xl font-extrabold tracking-[-.05em]">Talk to the team.</h1><p className="mt-4 max-w-2xl text-base leading-7 text-slate">Questions about the prototype, workflow or demonstration? Reach out directly.</p></div><ContactForm/></div>}

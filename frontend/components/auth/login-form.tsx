@@ -1,143 +1,15 @@
 'use client';
-
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import {FormEvent,useState} from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
-import { AuthBackground } from './auth-background';
-import { PairLogo } from '@/components/ui/pair-logo';
+import {useRouter} from 'next/navigation';
+import {motion} from 'framer-motion';
+import {ArrowRight,Lock,Mail,ShieldCheck} from 'lucide-react';
+import {PairLogo} from '@/components/ui/pair-logo';
+import {AuthBackground} from './auth-background';
+import {useAuth} from '@/hooks/use-auth';
 
-export function LoginForm() {
-  const router = useRouter();
-  const { login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    try {
-      if (!email || !password) {
-        setError('Please fill in all fields');
-        return;
-      }
-
-      if (!email.includes('@')) {
-        setError('Please enter a valid email');
-        return;
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      login({ email, name: email.split('@')[0] });
-      router.push('/app');
-    } catch (err) {
-      setError('Login failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
-      <AuthBackground />
-
-      <motion.div
-        className="w-full max-w-md z-10"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <Card className="border border-white/20 bg-black/60 backdrop-blur-xl p-8">
-          <Link href="/" className="mb-8 inline-flex">
-            <PairLogo size={38} />
-          </Link>
-
-          <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
-          <p className="text-gray-400 mb-8">
-            Sign in to your PAIR account to continue.
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-white">Email</label>
-              <div className="relative">
-                <Mail
-                  size={18}
-                  className="absolute left-3 top-3 text-gray-500"
-                />
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 bg-white/5 border-white/10 text-white placeholder-gray-500"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-white">Password</label>
-              <div className="relative">
-                <Lock size={18} className="absolute left-3 top-3 text-gray-500" />
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 bg-white/5 border-white/10 text-white placeholder-gray-500"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            <Link
-              href="#"
-              className="inline-block text-sm text-purple-400 hover:text-purple-300 transition-colors"
-            >
-              Forgot password?
-            </Link>
-
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:opacity-90 text-white font-medium"
-            >
-              {isLoading ? 'Signing in...' : 'Sign In'}
-              {!isLoading && <ArrowRight size={18} className="ml-2" />}
-            </Button>
-          </form>
-
-          <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-xs text-gray-500">OR</span>
-            <div className="flex-1 h-px bg-white/10" />
-          </div>
-
-          <p className="text-center text-sm text-gray-400">
-            Don't have an account?{' '}
-            <Link href="/signup" className="text-purple-400 hover:text-purple-300">
-              Create account
-            </Link>
-          </p>
-        </Card>
-      </motion.div>
-    </div>
-  );
+export function LoginForm(){
+ const router=useRouter(); const {login}=useAuth(); const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('');
+ async function submit(e:FormEvent){e.preventDefault();setError('');if(!email||!password){setError('Enter email and password.');return}setBusy(true);try{await login(email,password);router.push('/app')}catch(err){setError(err instanceof Error?err.message:'Unable to sign in.')}finally{setBusy(false)}}
+ return <div className="relative min-h-screen chassis flex items-center justify-center px-5 py-12"><AuthBackground/><motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="relative z-10 w-full max-w-md"><div className="industrial-panel rounded-[28px] p-7 md:p-9"><Link href="/" className="inline-flex"><PairLogo size={42}/></Link><div className="mt-9"><p className="technical text-[9px] font-bold text-accent">AUTH / 01</p><h1 className="mt-2 text-3xl font-extrabold tracking-[-.035em]">Welcome back.</h1><p className="mt-2 text-sm leading-6 text-slate">Sign in to your procurement intelligence workspace.</p></div>{error&&<div className="mt-5 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div>}<form onSubmit={submit} className="mt-7 space-y-5"><label className="block text-sm font-bold">Email<div className="relative mt-2"><Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate"/><input className="industrial-input pl-11" value={email} onChange={e=>setEmail(e.target.value)} type="email" placeholder="you@organisation.gov.in" autoComplete="email"/></div></label><label className="block text-sm font-bold">Password<div className="relative mt-2"><Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate"/><input className="industrial-input pl-11" value={password} onChange={e=>setPassword(e.target.value)} type="password" placeholder="••••••••" autoComplete="current-password"/></div></label><button disabled={busy} className="industrial-button industrial-button-accent w-full rounded-xl py-3 text-sm font-extrabold">{busy?'AUTHENTICATING…':'SIGN IN'}{!busy&&<ArrowRight size={16}/>}</button></form><div className="mt-6 flex items-center gap-2 text-[10px] font-mono text-slate"><ShieldCheck size={14} className="text-emerald-600"/> JWT authentication / server validated</div><p className="mt-7 text-center text-sm text-slate">New to PAIR? <Link href="/signup" className="font-extrabold text-accent hover:underline">Create account</Link></p></div></motion.div></div>
 }

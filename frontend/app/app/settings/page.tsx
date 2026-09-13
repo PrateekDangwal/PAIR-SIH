@@ -1,47 +1,8 @@
 'use client';
-
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Database, KeyRound, Server, ShieldCheck } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
-import { apiFetch } from '@/lib/api';
-
-type Status = { default_provider: string; default_model: string; nvidia_keys_configured: number; nvidia_fallback_models: string[] };
-
-export default function SettingsPage() {
-  const { user } = useAuth();
-  const [status, setStatus] = useState<Status | null>(null);
-
-  useEffect(() => { apiFetch<Status>('/api/v1/ai/status').then(setStatus).catch(() => undefined); }, []);
-
-  return (
-    <motion.div className="min-h-full p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="max-w-5xl mx-auto space-y-6">
-        <div>
-          <p className="text-sm text-purple-400 mb-2">Workspace configuration</p>
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-gray-500 mt-2">Account and PAIR runtime configuration.</p>
-        </div>
-
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <div className="flex items-center gap-3 mb-5"><ShieldCheck className="text-purple-400" size={20} /><h2 className="text-lg font-semibold">Account</h2></div>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div><p className="text-xs text-gray-500">Name</p><p className="text-white mt-1">{user?.name}</p></div>
-            <div><p className="text-xs text-gray-500">Email</p><p className="text-white mt-1">{user?.email}</p></div>
-          </div>
-        </section>
-
-        <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <div className="flex items-center gap-3 mb-5"><Server className="text-emerald-400" size={20} /><h2 className="text-lg font-semibold">AI Runtime</h2></div>
-          <div className="grid md:grid-cols-2 gap-5">
-            <div><p className="text-xs text-gray-500">Provider</p><p className="text-white mt-1">{status?.default_provider || 'Loading…'}</p></div>
-            <div><p className="text-xs text-gray-500">Default model</p><p className="text-white mt-1 break-all">{status?.default_model || 'Loading…'}</p></div>
-            <div className="flex gap-3"><KeyRound className="text-yellow-400" size={18} /><div><p className="text-xs text-gray-500">Server-side API keys</p><p className="text-white mt-1">{status?.nvidia_keys_configured ?? '—'} configured</p></div></div>
-            <div className="flex gap-3"><Database className="text-blue-400" size={18} /><div><p className="text-xs text-gray-500">Data store</p><p className="text-white mt-1">PostgreSQL</p></div></div>
-          </div>
-          <p className="text-xs text-gray-600 mt-6">API keys are never displayed in the UI. Configure them only in the backend environment.</p>
-        </section>
-      </div>
-    </motion.div>
-  );
-}
+import {useEffect,useState} from 'react';
+import {Database,KeyRound,LogOut,Server,ShieldCheck} from 'lucide-react';
+import {useAuth} from '@/hooks/use-auth';
+import {apiFetch} from '@/lib/api';
+import {IndustrialPanel,StatusLED,TechnicalLabel} from '@/components/ui/industrial';
+type Status={default_provider:string;default_model:string;nvidia_keys_configured:number;nvidia_fallback_models:string[]};
+export default function Settings(){const {user,logout}=useAuth();const [status,setStatus]=useState<Status|null>(null);useEffect(()=>{apiFetch<Status>('/api/v1/ai/status').then(setStatus).catch(()=>undefined)},[]);return <div className="mx-auto max-w-[1050px] px-4 py-7 md:px-7"><TechnicalLabel>CONTROL / SETTINGS</TechnicalLabel><h1 className="mt-2 text-4xl font-extrabold tracking-[-.04em]">Settings</h1><p className="mt-2 text-sm text-slate">Account and runtime information. Sensitive provider credentials remain server-side.</p><div className="mt-8 grid gap-6"><IndustrialPanel className="p-6 md:p-7"><div className="flex items-center justify-between"><div><TechnicalLabel>ACCOUNT</TechnicalLabel><h2 className="mt-1 text-xl font-extrabold">Workspace identity</h2></div><ShieldCheck className="text-accent" size={21}/></div><div className="mt-6 grid gap-4 sm:grid-cols-2"><div className="industrial-recessed rounded-xl p-4"><TechnicalLabel>EMAIL</TechnicalLabel><p className="mt-2 text-sm font-bold">{user?.email||'—'}</p></div><div className="industrial-recessed rounded-xl p-4"><TechnicalLabel>USER ID</TechnicalLabel><p className="mt-2 font-mono text-sm font-bold">{user?.id||'—'}</p></div></div><button onClick={logout} className="industrial-button mt-6 inline-flex items-center gap-2 rounded-xl bg-chassis px-4 text-sm font-bold text-red-600"><LogOut size={15}/> Sign out</button></IndustrialPanel><IndustrialPanel className="p-6 md:p-7"><div className="flex items-center justify-between"><div><TechnicalLabel>AI RUNTIME</TechnicalLabel><h2 className="mt-1 text-xl font-extrabold">Provider status</h2></div><StatusLED status="online" label="API"/></div><div className="mt-6 grid gap-4 sm:grid-cols-2"><div className="industrial-recessed rounded-xl p-4"><Server size={17} className="text-accent"/><TechnicalLabel className="mt-4 block">PROVIDER</TechnicalLabel><p className="mt-2 text-sm font-extrabold">{status?.default_provider||'Loading…'}</p></div><div className="industrial-recessed rounded-xl p-4"><KeyRound size={17} className="text-accent"/><TechnicalLabel className="mt-4 block">CONFIGURED KEYS</TechnicalLabel><p className="mt-2 font-mono text-xl font-bold">{status?.nvidia_keys_configured??'—'}</p></div><div className="industrial-recessed rounded-xl p-4"><Database size={17} className="text-accent"/><TechnicalLabel className="mt-4 block">DATA STORE</TechnicalLabel><p className="mt-2 text-sm font-extrabold">PostgreSQL</p></div><div className="industrial-recessed rounded-xl p-4"><TechnicalLabel>DEFAULT MODEL</TechnicalLabel><p className="mt-2 break-all text-xs font-bold">{status?.default_model||'Loading…'}</p></div></div><p className="mt-6 rounded-xl bg-[#d1d9e6] p-4 text-xs leading-5 text-slate">API keys are never displayed in PAIR. Configure provider credentials only in the backend environment.</p></IndustrialPanel></div></div>}

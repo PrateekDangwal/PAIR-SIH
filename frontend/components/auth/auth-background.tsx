@@ -1,7 +1,2 @@
-'use client';
-
-import { PAIRNetworkBackground } from './pair-network-background';
-
-export function AuthBackground() {
-  return <PAIRNetworkBackground />;
-}
+import { PairLogo } from '@/components/ui/pair-logo';
+export function AuthBackground(){return <div className="absolute inset-0 overflow-hidden bg-[#e0e5ec]"><div className="absolute inset-0 blueprint opacity-40"/><div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-white/70 blur-3xl"/><div className="absolute -bottom-32 -right-20 h-96 w-96 rounded-full bg-[#babecc]/40 blur-3xl"/><div className="absolute left-6 top-6 hidden items-center gap-3 md:flex"><PairLogo size={38}/><span className="technical text-[9px] font-bold text-slate">SECURE WORKSPACE</span></div></div>}
