@@ -22,38 +22,40 @@ const team = [
     [
         'AK',
         'Ankit Chaudhary',
-        'Code Checker / UI',
-        '/images/team/ankit.jpeg',
+        'UI/UX & Integration',
+        '/images/team/ANKITT.jpeg',
     ],
     [
         'AS',
-        'Anshul',
-        'Code Checker / UI',
-        '/images/team/anshul.jpeg',
+        'Anshul Sanon',
+        'Code Review / UI design',
+        '/images/team/ANSHULL.jpeg',
     ],
     [
         'HM',
         'Himanshu Yadav',
-        'Frontend',
-        '/images/team/himanshu.jpeg',
+        'Backend',
+        '/images/team/HIMANSHUUU.jpeg',
     ],
     [
         'DH',
         'Dhruvanshu Chaudhary',
         'Frontend',
-        '/images/team/dhruvanshu.jpeg',
+        '/images/team/DHRUVANSHUU.jpeg',
     ],
     [
         'MS',
-        'Misty',
+        'Mishthi Jain',
         'Testing',
-        '/images/team/misty.jpeg',
+        '/images/team/MISHTHII.jpeg',
     ],
 ];
 
 export default function AboutPage() {
     return (
         <div className="mx-auto max-w-6xl px-5 py-12 md:py-20">
+
+            {/* ABOUT */}
             <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -120,6 +122,8 @@ export default function AboutPage() {
 
             {/* TEAM */}
             <section className="mt-20">
+
+                {/* TEAM HEADER */}
                 <div className="mb-8 flex items-end justify-between">
                     <div>
                         <p className="technical text-[10px] text-accent">
@@ -134,63 +138,199 @@ export default function AboutPage() {
                     <Users className="text-slate" size={22} />
                 </div>
 
+                {/* TEAM GRID */}
                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
                     {team.map(([initials, name, role, image], i) => (
+
                         <motion.div
                             key={name}
                             whileHover={{ y: -4 }}
-                            className="industrial-panel rounded-2xl p-5"
+                            transition={{
+                                duration: 0.3,
+                                ease: [0.22, 1, 0.36, 1],
+                            }}
+                            className="
+                                group
+                                relative
+                                overflow-hidden
+                                industrial-panel
+                                rounded-2xl
+                                p-5
+                                transition-shadow
+                                duration-500
+                                hover:shadow-floating
+                            "
                         >
-                            <div className="flex items-center gap-4">
 
-                                {/* PROFILE PHOTO */}
-                                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-[#2d3436] shadow-floating">
-                                    <Image
-                                        src={image}
-                                        alt={`${name} profile`}
-                                        fill
-                                        className="object-cover"
-                                        sizes="56px"
-                                    />
+                            {/* MEMBER CONTENT */}
+                            <div className="flex min-h-[105px] items-center">
+
+                                {/* IMAGE SPACE
+                                    Important:
+                                    This wrapper itself grows.
+                                    So text never comes underneath image.
+                                */}
+                                <div
+                                    className="
+                                        relative
+                                        flex
+                                        h-14
+                                        w-14
+                                        shrink-0
+                                        items-center
+                                        justify-center
+
+                                        transition-all
+                                        duration-500
+                                        ease-[cubic-bezier(.22,1,.36,1)]
+
+                                        group-hover:h-[82px]
+                                        group-hover:w-[82px]
+                                    "
+                                >
+
+                                    {/* PROFILE IMAGE */}
+                                    <div
+                                        className="
+                                            relative
+                                            h-14
+                                            w-14
+                                            overflow-hidden
+                                            rounded-full
+                                            bg-[#2d3436]
+                                            shadow-floating
+
+                                            transition-all
+                                            duration-500
+                                            ease-[cubic-bezier(.22,1,.36,1)]
+
+                                            group-hover:h-[78px]
+                                            group-hover:w-[78px]
+                                        "
+                                    >
+                                        <Image
+                                            src={image}
+                                            alt={`${name} profile`}
+                                            fill
+                                            className="
+                                                object-cover
+                                                transition-transform
+                                                duration-700
+                                                ease-out
+                                                group-hover:scale-105
+                                            "
+                                            sizes="78px"
+                                        />
+                                    </div>
                                 </div>
 
+                                {/* SPACE BETWEEN IMAGE & TEXT */}
+                                <div className="w-4 shrink-0" />
+
                                 {/* NAME + ROLE */}
-                                <div>
-                                    <h3 className="font-extrabold">
+                                <div
+                                    className="
+                                        min-w-0
+                                        flex-1
+                                        overflow-hidden
+
+                                        transition-transform
+                                        duration-500
+                                        ease-[cubic-bezier(.22,1,.36,1)]
+
+                                        group-hover:translate-x-1
+                                    "
+                                >
+                                    <h3
+                                        className="
+                                            truncate
+                                            font-extrabold
+                                            leading-tight
+                                            text-[#292f35]
+                                        "
+                                    >
                                         {name}
                                     </h3>
 
-                                    <p className="mt-1 text-xs text-slate">
+                                    <p
+                                        className="
+                                            mt-1
+                                            truncate
+                                            text-xs
+                                            leading-5
+                                            text-slate
+
+                                            transition-colors
+                                            duration-300
+                                        "
+                                    >
                                         {role}
                                     </p>
                                 </div>
                             </div>
 
                             {/* CONTRIBUTOR */}
-                            <div className="mt-5 flex items-center gap-2 technical text-[8px] text-slate/60">
+                            <div
+                                className="
+                                    mt-5
+                                    flex
+                                    items-center
+                                    gap-2
+                                    technical
+                                    text-[8px]
+                                    text-slate/60
+                                "
+                            >
                                 {i === 0 ? (
                                     <Code2 size={12} />
                                 ) : i === 5 ? (
                                     <TestTube2 size={12} />
                                 ) : (
-                                    <Users size={12} />
+                                    <Code2 size={12} />
                                 )}
 
                                 CONTRIBUTOR
                             </div>
+
+                            {/* SUBTLE HOVER LIGHT */}
+                            <div
+                                className="
+                                    pointer-events-none
+                                    absolute
+                                    -right-12
+                                    -top-12
+                                    h-28
+                                    w-28
+                                    rounded-full
+                                    bg-white/30
+                                    blur-3xl
+
+                                    opacity-0
+                                    transition-opacity
+                                    duration-500
+
+                                    group-hover:opacity-100
+                                "
+                            />
+
                         </motion.div>
+
                     ))}
+
                 </div>
             </section>
 
             {/* PROJECT LINKS */}
             <section className="mt-20 industrial-panel rounded-[24px] p-7">
+
                 <p className="technical text-[10px] text-accent">
                     PROJECT LINKS
                 </p>
 
                 <div className="mt-5 flex flex-wrap gap-3">
 
+                    {/* GITHUB */}
                     <a
                         className="industrial-button inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold"
                         href="https://github.com/PrateekDangwal/PAIR-SIH"
@@ -201,6 +341,7 @@ export default function AboutPage() {
                         GitHub
                     </a>
 
+                    {/* LINKEDIN */}
                     <a
                         className="industrial-button inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold"
                         href="https://www.linkedin.com/in/prateek-dangwal-8479b0313/"
@@ -211,6 +352,7 @@ export default function AboutPage() {
                         LinkedIn
                     </a>
 
+                    {/* EMAIL */}
                     <a
                         className="industrial-button inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold"
                         href="mailto:prateeknnr77@gmail.com"
@@ -221,6 +363,7 @@ export default function AboutPage() {
 
                 </div>
             </section>
+
         </div>
     );
 }
